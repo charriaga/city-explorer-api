@@ -11,7 +11,8 @@ app.use(cors());
 const PORT = process.env.PORT;
 
 app.get('/weather', (request, response) => {
-    response = data.find(function (element) {
+    let responseData;
+    responseData = data.find(function (element) {
         if (element.city_name === request.searchQuery && element.lat === request.lat && element.lon === request.lon) {
             return element;
         } else {
@@ -20,21 +21,26 @@ app.get('/weather', (request, response) => {
     }
     );
 
+    //ChatGPT was consulted for line 24
+    const responseArr = Object.entries(responseData.data);
+
     class Forecast {
 
         constructor(element) {
             this.date = element.valid_date;
 
-            this.description = `A high of ${element.max_temp}, low of ${element.low_temp} with ${element.weather.description}`;
+            this.description = (`A high of ${element.max_temp}, low of ${element.low_temp} with ${element.weather.description}`);
         }
     }
 
 
-    const DaysArr = response.map((val)=> {
-        val = new Forecast(val);
+    const DaysArr = responseArr.map((val)=> {
+        console.log(val[1]);
+        val = new Forecast(val[1]);
         return val;
     });
-    response.json('daysArr');
+
+    response.send(DaysArr);
 
 });
 
