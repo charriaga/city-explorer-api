@@ -11,10 +11,12 @@ app.use(cors());
 const PORT = process.env.PORT;
 
 app.get('/weather', (request, response) => {
-    let query = request.query;
+    const query = request.query.searchQuery;
+    const lat = request.query.lat;
+    const lon = request.query.lon;
     let responseData;
     responseData = data.find((element) => {
-        if (element.city_name === query.searchQuery && element.lat === query.lat && element.lon === query.lon) {
+        if (element.city_name === query && element.lat === lat && element.lon === lon) {
             return element;
         } else {
             return 'Error, cannot find city';
@@ -22,7 +24,7 @@ app.get('/weather', (request, response) => {
     }
     );
 
-    //ChatGPT was consulted for line 24
+    //ChatGPT was consulted for line 25
     const responseArr = Object.entries(responseData.data);
 
     class Forecast {
