@@ -3,24 +3,32 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const data = require('./data/weather.json');
+const axios = require('axios');
 
 const app = express();
 
 app.use(cors());
 
 const PORT = process.env.PORT;
+const WEATHERAPI = process.env.WEATHER_API_KEY;
 
-app.get('/weather', (request, response) => {
-    let query = request.query;
+async function getWeather() { }
+
+app.get('/weather', async function (request, response) {
+    let lat = request.query.lat;
+    let lon = request.query.lon;
     let responseData;
-    responseData = data.find((element) => {
-        if (element.city_name === query.searchQuery && element.lat === query.lat && element.lon === query.lon) {
-            return element;
-        } else {
-            return 'Error, cannot find city';
-        }
+
+    const url = `http://api.weatherbit.io/v2.0/current?${WEATHERAPI}&lang=en&lat=${lat}&lon=${lon}`;
+
+    try {
+        responseData = await axios.get(url);
+        console.log(responseData);
+
+    } catch (error) {
+        console.log('error');
     }
-    );
+
 
     //ChatGPT was consulted for line 24
     const responseArr = Object.entries(responseData.data);
@@ -35,7 +43,7 @@ app.get('/weather', (request, response) => {
     }
 
 
-    const DaysArr = responseArr.map((val)=> {
+    const DaysArr = responseArr.map((val) => {
         console.log(val);
         val = new Forecast(val);
         return val;
@@ -44,5 +52,7 @@ app.get('/weather', (request, response) => {
     response.send(DaysArr);
 
 });
+
+getWeather();
 
 app.listen(PORT, () => console.log('server is listening'));
